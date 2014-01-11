@@ -12,17 +12,17 @@
 
 +(NSArray *)validShapes
 {
-    return @[@"●",@"■", @"▲"];
+    return @[@"diamond",@"squiggle", @"oval"];
 }
 
 +(NSArray *)validColors
 {
-    return @[@"red",@"blue",@"green"];  //blue, yellow
+    return @[@"green",@"purple",@"red"];  
 }
 
 +(NSArray *)validFills
 {
-    return @[@"pattern",@"solid",@"empty"];  //pattern, solid, empty
+    return @[@"pattern",@"solid",@"empty"];  
 }
 
 -(void)setShape:(NSString *)shape
@@ -94,40 +94,55 @@
         BOOL two_and_two_shape_and_count_same = 0;
         BOOL two_and_two_count_and_fill_same = 0;
         BOOL two_and_two_color_and_shape_same = 0;
-        BOOL three_count_different = 0;
-        BOOL three_color_different = 0;
-        BOOL three_fill_different = 0;
-        BOOL three_shape_different = 0;
+        BOOL three_same_count_different = 0;
+        BOOL three_same_color_different = 0;
+        BOOL three_same_fill_different = 0;
+        BOOL three_same_shape_different = 0;
+        BOOL three_diff_count_same = 0;
+        BOOL three_diff_color_same = 0;
+        BOOL three_diff_fill_same = 0;
+        BOOL three_diff_shape_same = 0;
+        
+        //color different, shape same, count same, fill ??
         
         
         if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
             everything_the_same = 1;
-        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
             everything_different = 1;
-        
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
             two_and_two_count_and_color_same = 1;
-        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && [firstCard.shape isEqualToString:thirdCard.shape])
             two_and_two_color_and_fill_same = 1;
-        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
             two_and_two_fill_and_shape_same = 1;
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
             two_and_two_shape_and_count_same = 1;
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
             two_and_two_count_and_fill_same = 1;
-        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
             two_and_two_color_and_shape_same = 1;
         
-        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
-            three_count_different = 1;
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
-            three_color_different = 1;
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
-            three_fill_different = 1;
-        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape])
-            three_shape_different = 1;
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+            three_same_count_different = 1;
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+            three_same_color_different = 1;
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+            three_same_fill_different = 1;
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
+            three_same_shape_different = 1;
         
-        if (everything_the_same | everything_different | two_and_two_color_and_fill_same | two_and_two_color_and_shape_same |two_and_two_count_and_color_same | two_and_two_count_and_fill_same | two_and_two_fill_and_shape_same | two_and_two_shape_and_count_same | three_shape_different | three_fill_different | three_count_different | three_color_different)
+        else if (firstCard.shapeCount == secondCard.shapeCount && secondCard.shapeCount == thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
+            three_diff_count_same = 1;
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && [firstCard.color isEqualToString:secondCard.color] && [secondCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
+            three_diff_color_same = 1;
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && [firstCard.fill isEqualToString:secondCard.fill] && [secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.shape isEqualToString:secondCard.shape] && ![secondCard.shape isEqualToString:thirdCard.shape] && ![firstCard.shape isEqualToString:thirdCard.shape])
+            three_diff_fill_same = 1;
+        else if (firstCard.shapeCount != secondCard.shapeCount && secondCard.shapeCount != thirdCard.shapeCount && firstCard.shapeCount != thirdCard.shapeCount && ![firstCard.color isEqualToString:secondCard.color] && ![secondCard.color isEqualToString:thirdCard.color] && ![firstCard.color isEqualToString:thirdCard.color] && ![firstCard.fill isEqualToString:secondCard.fill] && ![secondCard.fill isEqualToString:thirdCard.fill] && ![firstCard.fill isEqualToString:thirdCard.fill] && [firstCard.shape isEqualToString:secondCard.shape] && [secondCard.shape isEqualToString:thirdCard.shape])
+            three_diff_shape_same = 1;
+
+        
+        if (everything_the_same | everything_different | two_and_two_color_and_fill_same | two_and_two_color_and_shape_same |two_and_two_count_and_color_same | two_and_two_count_and_fill_same | two_and_two_fill_and_shape_same | two_and_two_shape_and_count_same | three_same_shape_different | three_same_fill_different | three_same_count_different | three_same_color_different | three_diff_count_same | three_diff_color_same | three_diff_fill_same | three_diff_shape_same)
             score = 200;
     }
     

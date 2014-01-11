@@ -9,7 +9,6 @@
 #import "Deck.h"
 
 @interface Deck()
-@property (strong, nonatomic) NSMutableArray *cards;
 @end
 
 @implementation Deck

@@ -22,24 +22,7 @@
 
 @implementation SetGameViewController
 
-- (IBAction)deal:(UIButton *)sender {
-    
-    self.game = nil;
-    
-    for (UIButton *cardButton in self.cardButtons)
-    {
-        Card *card = [self.game cardAtIndex:[self.cardButtons indexOfObject:cardButton]];
-        cardButton.selected = card.isFaceUp;
-        cardButton.alpha = 1.0;
-        cardButton.enabled = !card.isUnplayable;
-        [self updateUI];
-    }
-    
-    self.statusLabel.text = nil;
-    self.scoreLabel.text = [NSString stringWithFormat:@"Score: 0"];
 
-    
-}
 
 -(CardMatchingGame *) game
 {

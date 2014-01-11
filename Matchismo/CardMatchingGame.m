@@ -12,9 +12,25 @@
 @interface CardMatchingGame()
 @property (strong, nonatomic) NSMutableArray *cards; //only contains card objects
 @property (strong, nonatomic) NSMutableArray *cardQueue;
+
 @end
 
 @implementation CardMatchingGame
+
+- (void)removeCardAtIndex:(NSUInteger)index
+{
+    [self.cards removeObjectAtIndex:index];
+}
+
+- (int)numberOfCards
+{
+    return [self.cards count];
+}
+
+- (int)cardsLeftinDeck
+{
+    return [self.deck.cards count];
+}
 
 -(NSMutableArray *)cards{
     if (!_cards) _cards = [[NSMutableArray alloc] init];
@@ -35,8 +51,11 @@
             }
         }
     }
+    _deck = deck;
+    //we need to keep a pointer to the deck around so that we can add more cards. Otherwise, "AddThreeCardsToGame would NOT WORK!
     return self;
 }
+
 
 #define MATCH_BONUS 4
 #define MISMATCH_PENALTY 2
@@ -60,6 +79,7 @@
                         card.unplayable = YES;
                         self.score += matchScore * MATCH_BONUS;
                         self.match = YES;
+                        self.resetAfterMatch = YES;
                         if (matchScore ==2) self.points = 8;
                         else if (matchScore ==8) self.points = 32;
                         
@@ -67,6 +87,7 @@
                         otherCard.faceUp = NO;
                         self.score -= MISMATCH_PENALTY;
                         self.match = NO;
+                        self.resetAfterMatch = NO;
 
                     }
                 break;
@@ -93,7 +114,7 @@
 {
     Card *card = [self cardAtIndex:index];
     
-    if (!card.unplayable)
+    if (!card.isUnplayable)
     {
         if (!card.isFaceUp)
         {     //this for loop turns all the cards back over
@@ -126,10 +147,12 @@
                     firstCard.faceUp = !firstCard.isFaceUp;
                     [self clearQueue];
                     self.match = YES;
+                    self.resetAfterMatch = YES;
                 }else {
                     self.score -= MISMATCH_PENALTY;
                     [self clearQueue];
                     self.match = NO;
+                    self.resetAfterMatch = YES;
                 }
             }
         }
@@ -137,6 +160,14 @@
     card.faceUp = !card.isFaceUp;
 }
 
+-(void)addCardToGame
+{
+    if ([self.deck.cards count]>=3) {
+        Card *newCard1 = [self.deck drawRandomCard];
+        [self.cards addObject:newCard1];
+    }
+
+}
 
 -(Card *)cardAtIndex:(NSUInteger)index
 {

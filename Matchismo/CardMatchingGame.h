@@ -17,6 +17,11 @@
 
 -(void)flipCardAtIndex:(NSUInteger)index;
 
+-(void)addCardToGame;
+
+- (int)cardsLeftinDeck;
+
+- (void)removeCardAtIndex:(NSUInteger)index;
 
 -(void)flipTwoCardsAtIndex:(NSUInteger)index;
 
@@ -24,12 +29,20 @@
 
 -(Card *)cardAtIndex:(NSUInteger)index;
 
+- (int)numberOfCards;
+
 @property (nonatomic) int score;
 @property (weak, nonatomic) Card *priorPriorCard;
 @property (weak, nonatomic) Card *priorCard;
 @property (weak, nonatomic) Card *currentCard;
 @property (nonatomic) BOOL match;
+@property (nonatomic) BOOL resetAfterMatch;
 @property (nonatomic) int points;
+@property (strong, nonatomic) Deck *deck;
+
+
+
+
 
 
 @end

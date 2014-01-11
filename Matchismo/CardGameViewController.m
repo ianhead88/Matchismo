@@ -7,109 +7,252 @@
 //
 
 #import "CardGameViewController.h"
-#import "PlayingCardDeck.h"
-#import "CardMatchingGame.h"
+#import "PlayingCardCollectionViewCell.h"
+#import "SetCardCollectionViewCell.h"
 
 
-@interface CardGameViewController ()
-@property (weak, nonatomic) IBOutlet UILabel *flipsLabel;
+
+@interface CardGameViewController () <UICollectionViewDataSource>
 @property (nonatomic) int flipCount;
-@property (strong, nonatomic) IBOutletCollection(UIButton) NSArray *cardButtons;
-@property (strong, nonatomic) CardMatchingGame *game;
 @property (weak, nonatomic) IBOutlet UILabel *scoreLabel;
-@property (weak, nonatomic) IBOutlet UILabel *statusDisplay;
 @property (weak, nonatomic) IBOutlet UIButton *redealButton;
-@property (nonatomic) int selectorSwitch;
-@property (weak, nonatomic) IBOutlet UISegmentedControl *selectorSwichLabel;
+
 
 @end
 
 @implementation CardGameViewController
 
+-(NSInteger)numberOfSectionsInCollectionView:(UICollectionView *)collectionView
+{
+    return 1;
+}
+
+-(NSInteger)collectionView:(UICollectionView *)collectionView
+    numberOfItemsInSection:(NSInteger)section
+{
+    return self.game.numberOfCards;  // need to change this
+}
+
+
+-(UICollectionViewCell *) collectionView:(UICollectionView *)collectionView
+                  cellForItemAtIndexPath:(NSIndexPath *)indexPath
+{
+        UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[self giveReuseID] forIndexPath:indexPath];
+        Card *card = [self.game cardAtIndex:indexPath.item];
+        self.currentCardIndex = indexPath.item;
+        [self updateCell:cell usingCard:card];
+        return cell;
+}
+
+-(NSString *)giveReuseID
+{
+    return nil;  //abstract
+}
+
+-(void)updateCell:(UICollectionViewCell *)cell usingCard:(Card *)card
+{
+    //abstract
+}
+
+
 -(CardMatchingGame *) game
 {
-    if (!_game) _game = [[CardMatchingGame alloc] initWithCardCount:self.cardButtons.count usingDeck:[[PlayingCardDeck alloc] init]];
- 
+    if (!_game) _game = [[CardMatchingGame alloc] initWithCardCount:self.startingCardCount
+                                                          usingDeck:[self createDeck]]; 
     return _game;
 }
 
--(void)setFlipCount:(int)flipCount
-{
-    _flipCount = flipCount;
-    self.flipsLabel.text = [NSString stringWithFormat:@"Flips: %d", self.flipCount];
-}
-
-
--(void)setCardButtons:(NSArray *)cardButtons
-{
-    _cardButtons = cardButtons;
-    [self updateUI];
-}
+- (Deck *)createDeck{ return nil; } // abstract
 
 -(void)updateUI
 {
-    for (UIButton *cardButton in self.cardButtons) {
-        Card *card = [self.game cardAtIndex:[self.cardButtons indexOfObject:cardButton]];
-    
-        [cardButton setTitle:card.contents forState:UIControlStateSelected];
-        [cardButton setTitle:card.contents forState:UIControlStateSelected|UIControlStateDisabled];
-        cardButton.selected = card.isFaceUp;
-        cardButton.enabled = !card.isUnplayable;
-        cardButton.alpha = card.isUnplayable ? 0.3 : 1.0;
-        
-        if (cardButton.selected && !self.game.priorCard && !self.game.match)
-            self.statusDisplay.text = [NSString stringWithFormat:@"Flipped up %@", [[self.game currentCard] contents]];
-        
-        else if (cardButton.selected && self.game.priorCard && self.game.match) {
-            self.statusDisplay.text =
-            [NSString stringWithFormat:@"Matched %@ & %@ for %d points",
-              [[self.game currentCard] contents], [[self.game priorCard] contents], self.game.points];
-            self.game.priorCard = nil;
-        }
-        else if (cardButton.selected && self.game.priorCard && !self.game.match) {
-                self.statusDisplay.text =
-                [NSString stringWithFormat:@"%@ and %@ don't match", [[self.game currentCard] contents], [[self.game priorCard] contents]];
-                        
+    if (self.cardCollectionView) {
+        for (UICollectionViewCell *cell in [self.cardCollectionView visibleCells]) {
+            NSIndexPath *indexPath = [self.cardCollectionView indexPathForCell:cell];
+            Card *card = [self.game cardAtIndex:indexPath.item];
+            [self updateCell:cell usingCard:card];
         }
     }
+    
+    if (self.setCardCollectionView) {
+        for (UICollectionViewCell *cell in [self.setCardCollectionView visibleCells]) {
+            NSIndexPath *indexPath = [self.setCardCollectionView indexPathForCell:cell];
+            Card *card = [self.game cardAtIndex:indexPath.item];
+            [self updateCell:cell usingCard:card];
+            
+            // loop below is to remove cards from the game
+            for (int i = 1; i < self.game.numberOfCards; i++) {
+                Card *card = [self.game cardAtIndex:i];
+                if (card.isUnplayable) {
+                    [self.game removeCardAtIndex:i];
+                    [self.cardCollectionView deleteItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:i inSection:0]]];
+                }
+            }
+            [self.setCardCollectionView reloadData];
+        }
+    }
+
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: %d", self.game.score];
+
+    [self updateDisplay];
+    
 }
 
-
-- (IBAction)flipCard:(UIButton *)sender
+-(void)updateDisplay
 {
-    self.selectorSwichLabel.enabled = 0;
-    if (self.selectorSwitch == 1)
-    [self.game flipTwoCardsAtIndex:[self.cardButtons indexOfObject:sender]];
-    else
-        [self.game flipCardAtIndex:[self.cardButtons indexOfObject:sender]];
-    self.flipCount++;
-    [self updateUI];
+    //abstract
+}
+
+- (IBAction)flipCard:(UIGestureRecognizer *)gesture
+{    
+    CGPoint taplocation;
+    NSIndexPath *indexPath;
+    if (self.cardCollectionView) {
+        taplocation = [gesture locationInView:self.cardCollectionView];
+        indexPath = [self.cardCollectionView indexPathForItemAtPoint:taplocation];
+        [self.game flipCardAtIndex:indexPath.item];
+        
+        //logic below sets the display
+        
+        Card *card = [self.game cardAtIndex:indexPath.item];
+        if ([card isKindOfClass:[PlayingCard class]]) {
+            PlayingCard *playingCard = (PlayingCard *)card;
+        
+            if (!self.game.priorCard && !self.game.match && !self.game.resetAfterMatch) {
+     
+                self.playingCardDisplay1.rank = playingCard.rank;
+                self.playingCardDisplay1.suit = playingCard.suit;
+                self.playingCardDisplay1.faceUp = playingCard.isFaceUp;
+                
+                self.playingCardDisplay1.hidden = NO;
+            }
+            else if (self.game.priorCard && self.game.match) {
+                self.playingCardDisplay2.rank = playingCard.rank;
+                self.playingCardDisplay2.suit = playingCard.suit;
+                self.playingCardDisplay2.faceUp = playingCard.isFaceUp;
+                self.playingCardDisplay2.hidden = NO;
+                
+                self.playingCardDisplay1.rank = ((PlayingCard *)self.game.priorCard).rank;
+                self.playingCardDisplay1.suit = ((PlayingCard *)self.game.priorCard).suit;
+                self.playingCardDisplay1.faceUp = ((PlayingCard *)self.game.priorCard).isFaceUp;
+                
+                self.PCardMatchLabel.hidden = NO;
+                self.PCardMatchLabel.text = @"MATCH!";
+            }
+            else if (self.game.priorCard && !self.game.match && !self.game.resetAfterMatch) {
+                self.playingCardDisplay2.hidden = NO;
+                self.playingCardDisplay1.hidden = NO;
+                
+                self.playingCardDisplay2.rank = playingCard.rank;
+                self.playingCardDisplay2.suit = playingCard.suit;
+                self.playingCardDisplay2.faceUp = playingCard.isFaceUp;
+                
+                self.playingCardDisplay1.rank = ((PlayingCard *)self.game.priorCard).rank;
+                self.playingCardDisplay1.suit = ((PlayingCard *)self.game.priorCard).suit;
+                self.playingCardDisplay1.faceUp = !((PlayingCard *)self.game.priorCard).isFaceUp;
+                
+                self.PCardMatchLabel.hidden = NO;
+                self.PCardMatchLabel.text = @"DON'T MATCH!";
+                
+            }
+            else if (self.game.resetAfterMatch) {
+                
+                self.playingCardDisplay1.rank = playingCard.rank;
+                self.playingCardDisplay1.suit = playingCard.suit;
+                self.playingCardDisplay1.faceUp = playingCard.isFaceUp;
+                
+                self.playingCardDisplay2.hidden = YES;
+                
+                self.PCardMatchLabel.hidden = YES;
+            }
+        }
+        [self updateUI];
+    }
+    
+    if (self.setCardCollectionView) {
+        taplocation = [gesture locationInView:self.setCardCollectionView];
+        indexPath = [self.setCardCollectionView indexPathForItemAtPoint:taplocation];
+        [self.game flipTwoCardsAtIndex:indexPath.item];
+        
+        // logic to set the display
+        
+        Card *card = [self.game cardAtIndex:indexPath.item];
+        if ([card isKindOfClass:[SetCard class]]) {
+            SetCard *setCard = (SetCard *)card;
+            
+            if (self.game.cardQueue.count==1) {
+                
+                self.setCardDisplay1.color = setCard.color;
+                self.setCardDisplay1.shapeCount = setCard.shapeCount;
+                self.setCardDisplay1.shape = setCard.shape;
+                self.setCardDisplay1.fill = setCard.fill;
+                            
+                self.setCardDisplay1.hidden = NO;
+                self.setCardDisplay2.hidden = YES;
+                self.setCardDisplay3.hidden = YES;
+                
+                self.setCardMatchLabel.hidden = YES;
+            }
+            else if (self.game.cardQueue.count==2) {
+                self.setCardDisplay2.color = setCard.color;
+                self.setCardDisplay2.shapeCount = setCard.shapeCount;
+                self.setCardDisplay2.shape = setCard.shape;
+                self.setCardDisplay2.fill = setCard.fill;
+                self.setCardDisplay2.hidden = NO;
+            }
+            else if (self.game.match) {
+                self.setCardDisplay3.color = setCard.color;
+                self.setCardDisplay3.shapeCount = setCard.shapeCount;
+                self.setCardDisplay3.shape = setCard.shape;
+                self.setCardDisplay3.fill = setCard.fill;
+                self.setCardDisplay3.hidden = NO;
+                
+                self.setCardMatchLabel.hidden = NO;
+                self.setCardMatchLabel.text = @"MATCH!";
+            }
+            else if (!self.game.match) {
+                self.setCardDisplay3.color = setCard.color;
+                self.setCardDisplay3.shapeCount = setCard.shapeCount;
+                self.setCardDisplay3.shape = setCard.shape;
+                self.setCardDisplay3.fill = setCard.fill;
+                self.setCardDisplay3.hidden = NO;
+                
+                self.setCardMatchLabel.hidden = NO;
+                self.setCardMatchLabel.text = @"DON'T MATCH!";
+            }
+            else if (self.game.resetAfterMatch) {
+                self.setCardDisplay1.color = setCard.color;
+                self.setCardDisplay1.shapeCount = setCard.shapeCount;
+                self.setCardDisplay1.shape = setCard.shape;
+                self.setCardDisplay1.fill = setCard.fill;
+                
+                self.setCardDisplay2.hidden = YES;
+                self.setCardDisplay3.hidden = YES;
+                
+                self.setCardMatchLabel.hidden = YES;
+            }
+            
+        }
+        [self updateUI];
+    }
 }
 
 - (IBAction)redeal:(UIButton *)sender {
     
-    self.selectorSwichLabel.enabled = 1;
-    
     self.game = nil;
+    self.playingCardDisplay1.hidden = YES;
+    self.playingCardDisplay2.hidden = YES;
+    self.PCardMatchLabel.hidden = YES;
     
-    for (UIButton *cardButton in self.cardButtons)
-    {
-        Card *card = [self.game cardAtIndex:[self.cardButtons indexOfObject:cardButton]];
-        cardButton.selected = card.isFaceUp;
-        cardButton.alpha = 1.0;
-        cardButton.enabled = !card.isUnplayable;
-    }
+    self.setCardDisplay1.hidden = YES;
+    self.setCardDisplay2.hidden = YES;
+    self.setCardDisplay3.hidden = YES;
+    self.setCardMatchLabel.hidden = YES;
     
-    self.statusDisplay.text = nil;
+    [self updateUI];
+    [self.setCardCollectionView reloadData];
+
     self.scoreLabel.text = [NSString stringWithFormat:@"Score: 0"];
-    self.flipsLabel.text = [NSString stringWithFormat:@"Flips: 0"];
-    self.flipCount = 0;
-    
-}
-- (IBAction)gameMode:(UISegmentedControl *)sender {
-    
-    self.selectorSwitch = sender.selectedSegmentIndex;
 }
 
 @end
